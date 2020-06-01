@@ -2,78 +2,46 @@ package converter
 
 import java.util.*
 
+enum class UNIT(val meters: Double, private val plural: String) {
+    METER(1.0, "meters"),
+    KILOMETER(1000.0, "kilometers"),
+    CENTIMETER(0.01, "centimeters"),
+    MILLIMETER(0.001, "millimeters"),
+    MILE(1609.35, "miles"),
+    YARD(0.9144, "yards"),
+    FOOT(0.3048, "feet"),
+    INCH(0.0254, "inches"),
+    NULL(0.0, "");
+
+    fun getName(n: Double): String {
+        return if (n == 1.0) name.toLowerCase() else plural
+    }
+
+    companion object {
+        fun getUnit(unit: String): UNIT {
+            return when (unit) {
+                "m", "meter", "meters" -> METER
+                "km", "kilometer", "kilometers" -> KILOMETER
+                "cm", "centimeter", "centimeters" -> CENTIMETER
+                "mm", "millimeter", "millimeters" -> MILLIMETER
+                "mi", "mile", "miles" -> MILE
+                "yd", "yard", "yards" -> YARD
+                "ft", "foot", "feet" -> FOOT
+                "in", "inch", "inches" -> INCH
+                else -> NULL
+            }
+        }
+    }
+}
+
 fun main() {
 
     println("Enter a number and a measure of length: ")
     val scanner = Scanner(System.`in`)
     val n = scanner.nextDouble()
-    var unit = scanner.next().toLowerCase()
-    var res = 0.0
+    val unit = scanner.next().toLowerCase()
+    val newUnit = UNIT.getUnit(unit)
+    val newValue = n * newUnit.meters
 
-    fun plural(n: Double): String {
-        return if (n == 1.0) "" else "s"
-    }
-
-    fun displayResult(n: Double, unit: String, res: Double): String {
-        return "$n $unit${plural(n)} is $res meter${plural(res)}"
-    }
-
-    when (unit) {
-        "m", "meter", "meters" -> {
-            res = n
-            unit = "meter"
-        }
-        "km", "kilometer", "kilometers" -> {
-            res = n * 1000
-            unit = "kilometer"
-        }
-        "cm", "centimeter", "centimeters" -> {
-            res = n / 100
-            unit = "centimeter"
-        }
-        "mm", "millimeter", "millimeters" -> {
-            res = n / 1000
-            unit = "millimeter"
-        }
-        "mi", "mile", "miles" -> {
-            res = n * 1609.35
-            unit = "mile"
-        }
-        "yd", "yard", "yards" -> {
-            res = n * 0.9144
-            unit = "yard"
-        }
-        "ft", "foot", "feet" -> {
-            res = n * 0.3048
-            unit = "feet"
-        }
-        "in", "inch", "inches" -> {
-            res = n * 0.0254
-            unit = "inches"
-        }
-    }
-
-    if (unit == "feet") {
-        when {
-            n == 1.0 -> {
-                println("$n foot is $res meters")
-            }
-            res == 1.0 -> {
-                println("$n feet is $res meter")
-            }
-            else -> println("$n feet is $res meters")
-        }
-    } else if (unit == "inches") {
-        when {
-            n == 1.0 -> {
-                println("$n inch is $res meters")
-            }
-            res == 1.0 -> {
-                println("$n inches is $res meter")
-            }
-            else -> println("$n inches is $res meters")
-        }
-    } else if (unit != "feet" || unit != "inches") {
-        println(displayResult(n, unit, res))
-    }
+    println("$n ${newUnit.getName(n)} is $newValue ${UNIT.METER.getName(newValue)}")
 }
