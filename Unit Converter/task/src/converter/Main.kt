@@ -1,8 +1,14 @@
 package converter
 
 import java.util.*
+import kotlin.system.exitProcess
 
-enum class UNIT(val meters: Double, private val plural: String) {
+enum class Unit(val baseUnit: Double, private val plural: String) {
+    GRAM(1.0, "grams"),
+    KILOGRAM(1000.0, "kilograms"),
+    MILLIGRAM(0.001, "milligrams"),
+    POUND(453.592, "pounds"),
+    OUNCE(28.3495, "ounces"),
     METER(1.0, "meters"),
     KILOMETER(1000.0, "kilometers"),
     CENTIMETER(0.01, "centimeters"),
@@ -18,8 +24,13 @@ enum class UNIT(val meters: Double, private val plural: String) {
     }
 
     companion object {
-        fun getUnit(unit: String): UNIT {
+        fun getUnit(unit: String): Unit {
             return when (unit) {
+                "g", "gram", "grams" -> GRAM
+                "kg", "kilogram", "kilograms" -> KILOGRAM
+                "mg", "milligram", "milligrams" -> MILLIGRAM
+                "lb", "pound", "pounds" -> POUND
+                "oz", "ounce", "ounces" -> OUNCE
                 "m", "meter", "meters" -> METER
                 "km", "kilometer", "kilometers" -> KILOMETER
                 "cm", "centimeter", "centimeters" -> CENTIMETER
@@ -34,14 +45,21 @@ enum class UNIT(val meters: Double, private val plural: String) {
     }
 }
 
+private const val EOP = "exit"
+
 fun main() {
-
-    println("Enter a number and a measure of length: ")
     val scanner = Scanner(System.`in`)
-    val n = scanner.nextDouble()
-    val unit = scanner.next().toLowerCase()
-    val newUnit = UNIT.getUnit(unit)
-    val newValue = n * newUnit.meters
-
-    println("$n ${newUnit.getName(n)} is $newValue ${UNIT.METER.getName(newValue)}")
+    do {
+        println("Enter what you want to convert (or exit): ")
+        val input = scanner.nextLine()
+        val args = input.split(" ")
+        if (args.size == 4) {
+            var n = args[0].toDouble()
+            var inUnit = Unit.getUnit(args[1].toLowerCase())
+            var outUnit = Unit.getUnit(args[3].toLowerCase())
+            val converted = n * inUnit.baseUnit / outUnit.baseUnit
+            println("$n ${inUnit.getName(n)} is $converted ${outUnit.getName(converted)}")
+        }
+    } while (input != EOP)
+    exitProcess(0)
 }
